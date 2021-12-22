@@ -4,9 +4,6 @@ import pandas as pd
 from scipy.stats import norm
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
-from datetime import datetime
-import requests
-from io import BytesIO
 import itertools
 print("init done.")
 
@@ -15,17 +12,20 @@ pd.plotting.register_matplotlib_converters()
 plt.rc("figure", figsize=(16,8))
 plt.rc("font", size=14)
 
-# Dataset
-# wpi1 = requests.get('https://www.stata-press.com/data/r12/wpi1.dta').content
-# data = pd.read_stata(BytesIO(wpi1))
-# print(data)
-# data.index = data.t
+
 
 data=pd.read_csv("data/full_grouped.csv")
 data=data.loc[data['Country/Region'] == "Russia"]
-data=data.set_index(["Date"])
-# data=pd.get_dummies(data, columns=["Date"])
-print(data)
+# data.drop("Country/Region",1, inplace=True)
+# data.drop("WHO Region",1, inplace=True)
+y=data.loc[:,["Date","Deaths"]]
+y=y.set_index(["Date"])
+
+print(type(y))
+print(y)
+# y.plot(figsize=(19,4))
+# plt.show()
+# input()
 
 p = d = q = range(0, 2)
 pdq = list(itertools.product(p, d, q))
@@ -36,27 +36,49 @@ print('SARIMAX: {} x {}'.format(pdq[1], seasonal_pdq[2]))
 print('SARIMAX: {} x {}'.format(pdq[2], seasonal_pdq[3]))
 print('SARIMAX: {} x {}'.format(pdq[2], seasonal_pdq[4]))
 
-# print(np.asarray(data))
+# y=y["Deaths"].values
+# y=y.to_numpy()
+y=y.values
+print(y)
+# raise
+arima=""
+min_aic=9**10
+min_arima=""
 for param in pdq:
     for param_seasonal in seasonal_pdq:
         try:
-            mod = sm.tsa.statespace.SARIMAX(data,order=param,seasonal_order=param_seasonal,enforce_stationarity=False,enforce_invertibility=False)
+            mod = sm.tsa.statespace.SARIMAX(y,order=param,seasonal_order=param_seasonal,enforce_stationarity=False,enforce_invertibility=False)
             results = mod.fit()
-            print('ARIMA{}x{}12 - AIC:{}'.format(param,param_seasonal,results.aic))
-        except ZeroDivisionError: 
+            arima+='ARIMA{}x{}12 - AIC:{}'.format(param,param_seasonal,results.aic)+"\n"
+            if results.aic<min_aic:
+                min_aic=results.aic
+                min_arima='ARIMA{}x{}12 - AIC:{}'.format(param,param_seasonal,results.aic)
+        except: 
             continue
-# data.index.freq="QS-OCT"
+print(arima)
+print("min aic",min_aic)
+print("optimal arima", min_arima)
 
-# # Fit the model
-# mod = sm.tsa.statespace.SARIMAX(data['Deaths'], trend='c', order=(1,1,1))
-# res = mod.fit(disp=False)
-# print(res.summary())
+mod = sm.tsa.statespace.SARIMAX(y,
+                                order=(1, 1, 1),
+                                seasonal_order=(1, 1, 1, 12),
+                                enforce_stationarity=False,
+                                enforce_invertibility=False)
+results = mod.fit()
+print(results.summary().tables[1])
 
-# # Graph data
-# fig, axes = plt.subplots(1, 1, figsize=(15,4))
+results.plot_diagnostics(figsize=(18, 8))
+plt.show()
 
-# # Levels
-# axes.plot(data.index._mpl_repr(), data['Deaths'], '-')
-# axes.set(title='Смертность')
-
-# plt.show()
+print(type(results))
+pred = results.get_prediction(start=pd.to_datetime('2020-07-23'), end=pd.to_datetime('2020-07-27'), dynamic=False)
+pred_ci = pred.conf_int()
+ax = y['2015':].plot(label='observed')
+pred.predicted_mean.plot(ax=ax, label='One-step ahead Forecast', alpha=.7, figsize=(14, 4))
+ax.fill_between(pred_ci.index,
+                pred_ci.iloc[:, 0],
+                pred_ci.iloc[:, 1], color='k', alpha=.2)
+ax.set_xlabel('Date')
+ax.set_ylabel('Retail_sold')
+plt.legend()
+plt.show()
