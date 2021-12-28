@@ -38,32 +38,29 @@ print('SARIMAX: {} x {}'.format(pdq[2], seasonal_pdq[4]))
 
 # y=y["Deaths"].values
 # y=y.to_numpy()
-y=y.values
-print(y)
+y2=y.values
+print("Y val:",y2)
 # raise
-arima=""
-min_aic=9**10
-min_arima=""
-for param in pdq:
-    for param_seasonal in seasonal_pdq:
-        try:
-            mod = sm.tsa.statespace.SARIMAX(y,order=param,seasonal_order=param_seasonal,enforce_stationarity=False,enforce_invertibility=False)
-            results = mod.fit()
-            arima+='ARIMA{}x{}12 - AIC:{}'.format(param,param_seasonal,results.aic)+"\n"
-            if results.aic<min_aic:
-                min_aic=results.aic
-                min_arima='ARIMA{}x{}12 - AIC:{}'.format(param,param_seasonal,results.aic)
-        except: 
-            continue
-print(arima)
-print("min aic",min_aic)
-print("optimal arima", min_arima)
 
-mod = sm.tsa.statespace.SARIMAX(y,
-                                order=(1, 1, 1),
-                                seasonal_order=(1, 1, 1, 12),
-                                enforce_stationarity=False,
-                                enforce_invertibility=False)
+# arima=""
+# min_aic=9**10
+# min_arima=""
+# for param in pdq:
+#     for param_seasonal in seasonal_pdq:
+#         try:
+#             mod = sm.tsa.statespace.SARIMAX(y,order=param,seasonal_order=param_seasonal,enforce_stationarity=False,enforce_invertibility=False)
+#             results = mod.fit()
+#             arima+='ARIMA{}x{}12 - AIC:{}'.format(param,param_seasonal,results.aic)+"\n"
+#             if results.aic<min_aic:
+#                 min_aic=results.aic
+#                 min_arima='ARIMA{}x{}12 - AIC:{}'.format(param,param_seasonal,results.aic)
+#         except: 
+#             continue
+# print(arima)
+# print("min aic",min_aic)
+# print("optimal arima", min_arima)
+
+mod = sm.tsa.statespace.SARIMAX(y2,order=(1, 1, 1),seasonal_order=(1, 1, 1, 12),enforce_stationarity=False,enforce_invertibility=False)
 results = mod.fit()
 print(results.summary().tables[1])
 
@@ -71,10 +68,10 @@ results.plot_diagnostics(figsize=(18, 8))
 plt.show()
 
 print(type(results))
-pred = results.get_prediction(start=pd.to_datetime('2020-07-23'), end=pd.to_datetime('2020-07-27'), dynamic=False)
+pred = results.get_prediction(dynamic=False) #start=pd.to_datetime('2020-07-23'), end=pd.to_datetime('2020-07-27')
 pred_ci = pred.conf_int()
-ax = y['2015':].plot(label='observed')
-pred.predicted_mean.plot(ax=ax, label='One-step ahead Forecast', alpha=.7, figsize=(14, 4))
+ax = y['2020':].plot(label='observed')
+# pred.predicted_mean.plot(ax=ax, label='One-step ahead Forecast', alpha=.7, figsize=(14, 4))
 ax.fill_between(pred_ci.index,
                 pred_ci.iloc[:, 0],
                 pred_ci.iloc[:, 1], color='k', alpha=.2)
