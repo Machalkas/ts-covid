@@ -1,0 +1,9 @@
+version: "3.7"
+
+services:
+
+  app:
+    image: app:latest
+    ports:
+      - 5000:5000
+    container_name: app_server

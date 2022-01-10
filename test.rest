@@ -1,0 +1,9 @@
+GET http://127.0.0.1:5000/predict?predictor=Смертей&numDays=10
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+###
+
+GET http://127.0.0.1:5000/columns
+Accept: application/json
+Content-Type: application/json; charset=utf-8
