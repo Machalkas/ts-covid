@@ -22,4 +22,4 @@ def predict():
     return flask.jsonify({"mean": mean.to_dict(), "ci": ci.to_dict()})
 
 if __name__ == "__main__":
-    app.run(debug=True, host="localhost")
+    app.run(debug=True, host="0.0.0.0")
