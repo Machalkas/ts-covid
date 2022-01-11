@@ -54,7 +54,7 @@ class CovidOracle():
         if model:
             self.model=model
         for col in ts_columns:
-            mod = sm.tsa.statespace.SARIMAX(self.data[col])
+            mod = sm.tsa.statespace.SARIMAX(self.data[col], order=self.model[col])
             self.__mod__[col]=mod
             self.__result__[col] = mod.fit(disp=False)
 
@@ -67,8 +67,12 @@ class CovidOracle():
 
 import flask
 
-cv = CovidOracle(filename="data/covid.csv", load_last_model=False)
+
+
+
+cv = CovidOracle(filename="data/covid.csv", load_last_model=True)
 cv.fitModel(cv.columns)
+
 
 app = flask.Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -87,4 +91,4 @@ def predict():
     return flask.jsonify({"mean": mean.to_dict(), "ci": ci.to_dict()})
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host="localhost")
