@@ -4,6 +4,7 @@ import covidOracle
 cv = covidOracle.CovidOracle(filename="data/covid.csv", load_last_model=True)
 cv.fitModel(cv.columns)
 
+
 app = flask.Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
@@ -21,4 +22,4 @@ def predict():
     return flask.jsonify({"mean": mean.to_dict(), "ci": ci.to_dict()})
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host="localhost")

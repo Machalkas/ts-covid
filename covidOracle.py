@@ -66,13 +66,13 @@ class CovidOracle():
         
 
 if __name__=="__main__":
-    cv=CovidOracle(filename="data/covid.csv")
-    print("Columns",cv.columns) #все доступные предикторы
-    print("Estimating...")
-    print("Model:",cv.estimateModel(cv.columns)) #Подбираем модели под предикторы. Осторожно! Очень долго выполняется (в моем случае около 2-х минут). Для того, чтобы ускорить процесс, можно выполнять функцию не для всех предикторов
-    cv.fitModel(cv.columns) #создаем модели
-    print("Prediction:",cv.makePrediction("Смертей",10)[0]) #Делаем предсказание на 10 дней вперед для предиктора 'Смертей'
-    del cv
+    # cv=CovidOracle(filename="data/covid.csv")
+    # print("Columns",cv.columns) #все доступные предикторы
+    # print("Estimating...")
+    # print("Model:",cv.estimateModel(cv.columns)) #Подбираем модели под предикторы. Осторожно! Очень долго выполняется (в моем случае около 2-х минут). Для того, чтобы ускорить процесс, можно выполнять функцию не для всех предикторов
+    # cv.fitModel(cv.columns) #создаем модели
+    # print("Prediction:",cv.makePrediction("Смертей",10)[0]) #Делаем предсказание на 10 дней вперед для предиктора 'Смертей'
+    # del cv
 
     cv=CovidOracle(filename="data/covid.csv", load_last_model=True) #Заново создаем экземпляр, но в этот раз используем уже подобранные модели (модельи автоматически сохраняются в файл last_model при вызове функции estimateModel())
     cv.fitModel(cv.columns)
