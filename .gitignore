@@ -1,3 +1,4 @@
 env
+env_wsl
 .vscode
 __pycache__

@@ -61,12 +61,12 @@ class CovidOracle():
     def makePrediction(self, ts_column:str, nforecast):
         predict = self.__result__[ts_column].get_prediction(end=self.__mod__[ts_column].nobs + nforecast)
         predict_ci = predict.conf_int(alpha=0.5)
-        return predict.predicted_mean[-nforecast:], predict_ci
+        return predict.predicted_mean[-nforecast:], predict_ci.get([predict_ci.columns[0],predict_ci.columns[1]])[-nforecast:]
 
         
 
 if __name__=="__main__":
-    # cv=CovidOracle(filename="data/covid.csv")
+    cv=CovidOracle(filename="data/covid.csv")
     # print("Columns",cv.columns) #все доступные предикторы
     # print("Estimating...")
     # print("Model:",cv.estimateModel(cv.columns)) #Подбираем модели под предикторы. Осторожно! Очень долго выполняется (в моем случае около 2-х минут). Для того, чтобы ускорить процесс, можно выполнять функцию не для всех предикторов
