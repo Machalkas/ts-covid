@@ -35,7 +35,6 @@ jobs:
     - name: Run compose and test REST endpoints
       run: |
         docker-compose up --detach
-        docker exec -it app_server /bin/bash
-        curl -G "http://127.0.0.1:5000/columns"
-        curl -G --data-urlencode "predictor=Смертей" --data-urlencode "numDays=10" http://127.0.0.1:5000/predict
+        docker exec --detach app_server /bin/bash curl -G "http://127.0.0.1:5000/columns"
+        docker exec --detach app_server /bin/bash curl -G --data-urlencode "predictor=Смертей" --data-urlencode "numDays=10" http://127.0.0.1:5000/predict
         docker-compose down
