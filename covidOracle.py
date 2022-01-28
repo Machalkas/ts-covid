@@ -9,13 +9,13 @@ warnings.filterwarnings("ignore")
 class CovidOracle():
     model,data,columns={},None,None
     __result__,__mod__={},{}
-    def __init__(self, data=None, filename:str=None, csv_sep:str=";", df_index:str="Дата", model:tuple=None, load_last_model:bool=False, file:str="last_model.json"):
+    def __init__(self, data=None, filename:str=None, csv_sep:str=";", df_index:str="Дата", model:tuple=None, load_last_model:bool=False):
         if data:
             self.data=data
         elif filename:
             self.uploadFile(filename, csv_sep, df_index)
         if load_last_model:
-            with open(file,"r") as f:
+            with open("last_model.json","r") as f:
                 self.model=json.load(f)
         elif model:
             self.model=model
@@ -29,7 +29,7 @@ class CovidOracle():
         self.columns=list(dt.columns)
         self.data=dt
     
-    def estimateModel(self, ts_columns:list, file:str="last_model.json"):
+    def estimateModel(self, ts_columns:list):
         for col in ts_columns:
             aic_full = pd.DataFrame(np.zeros((6,6), dtype=float))
             for p in range(6):
@@ -45,7 +45,7 @@ class CovidOracle():
             aic_filter=np.nan_to_num(aic_full)
             p,q=np.where(aic_filter==np.min(aic_filter[np.nonzero(aic_filter)]))
             self.model[col]=(int(p[0]),0,int(q[0]))
-            with open(file,"w") as f:
+            with open("last_model.json","w") as f:
                 json.dump(self.model,f)
         self.fitModel(ts_columns)
         return self.model
